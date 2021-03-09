@@ -1,5 +1,11 @@
-# WhichCollegeToGo
-G5063 2021 Spring Data Visualization Group Project  
+# WhichCollegeToGo  
+G5063 2021 Spring Data Visualization Group Project    
+Team Members:   
+Cunhonghu Ding, cd3197@columbia.edu;  
+Weiran Yu, wy2365@columbia.edu;  
+Qianyun Wang, qw2325@columbia.edu;  
+Hongcen Tu,ht2547@columbia.edu.
+
 ### Topic
 Which college in the United States offers you the best chance to climb up the ladder?
 
