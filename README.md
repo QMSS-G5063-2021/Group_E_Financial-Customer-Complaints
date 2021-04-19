@@ -10,12 +10,13 @@ Hongcen Tu,ht2547@columbia.edu.
 Visualizing the consumer complaints from the Bureau of Consumer Financial Protection (CFPB)    
 
 ### Motivation
-The purpose of this project is to develop a web application that allows users to quickly explore the Consumer Complaint Database through visualizations. The tool would serve as a starting point for exploratory analysis into this dataset. We have made the raw data available to download for everyone who comes across this tool. Some of the questions that can be answered using this web application include:    
-Which states receive the highest number of consumer complaints?    
-What are the most frequent terms associated with complaints?    
-Do the sentiments expressed differ by financial product?    
-Have the trends in consumer complaints changed following COVID?    
-Which companies receive the most amount of complaints?    
+The purpose of this project is to develop a web application that allows users to quickly explore the Consumer Complaint Database through visualizations. The tool would serve as a starting point for exploratory analysis into this dataset. We have made the raw data available to download for everyone who comes across this tool. Some of the questions that can be answered using this web application include:
+
+1. Which states receive the highest number of consumer complaints?    
+2. What are the most frequent terms associated with complaints?    
+3. Do the sentiments expressed differ by financial product?    
+4. Have the trends in consumer complaints changed following COVID?    
+5. Which companies receive the most amount of complaints?    
 
 ### Data Descriptions
 
