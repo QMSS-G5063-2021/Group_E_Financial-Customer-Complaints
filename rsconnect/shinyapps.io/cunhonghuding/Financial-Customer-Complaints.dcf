@@ -1,0 +1,13 @@
+name: Financial-Customer-Complaints
+title: Financial-Customer-Complaints
+username:
+account: cunhonghuding
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3986365
+bundleId: 4488338
+url: https://cunhonghuding.shinyapps.io/Financial-Customer-Complaints/
+when: 1618793615.97032
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: app-all.R|app-cathy.R|app-ding.R|app-yun.R|homepage.jpg|project_nlp-ran.html
