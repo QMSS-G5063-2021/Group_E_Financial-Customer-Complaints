@@ -23,3 +23,5 @@ Description:
 The Consumer Complaint Database is a collection of complaints about consumer financial products and services that we sent to companies for response. Complaints are published after the company responds, confirming a commercial relationship with the consumer, or after 15 days, whichever comes first. Complaints referred to other regulators, such as complaints about depository institutions with less than $10 billion in assets, are not published in the Consumer Complaint Database. The database generally updates daily. Each row in this data set corresponds to a complaint that was given by a customer and the related attributes such as a narrative, issue and sub-issue type, related financial product, etc.    
 Source: https://www.consumerfinance.gov/data-research/consumer-complaints/ 
 
+### Shiny App Link: 
+https://cunhonghuding.shinyapps.io/Financial-Customer-Complaints/ 
