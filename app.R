@@ -36,17 +36,17 @@ Sys.setlocale(locale="English")
 
 # load the rds data written previously
 
-dat <- read_rds("cfpb_1y.rds")
+dat <- read_rds("./data/cfpb_1y.rds")
 dat$yearmon = as.yearmon(dat$date)
 
 # load up tdm data
-dfComplaints_tdm = read.csv('dfComplaints_tdm.csv')
+dfComplaints_tdm = read.csv('./data/dfComplaints_tdm.csv')
 
 # load up data for sentiment
-dfComplaints = read.csv('dfComplaints.csv')
+dfComplaints = read.csv('./data/dfComplaints.csv')
 
 # load up data for pyramid plot
-dfSampleTop20 = read.csv('dfSampleTop20.csv')
+dfSampleTop20 = read.csv('./data/dfSampleTop20.csv')
 
 # 1. Prepare to merge the state map and electoral data
 cfpb_state <- dat %>%
@@ -160,14 +160,14 @@ ui <- navbarPage("Financial Consumer Complaints",
 server <- function(input, output) {
   
   output$png <- renderPlot({
-    pic = readPNG('logo.png')
+    pic = readPNG('./images/logo.png')
     plot.new()
     grid::grid.raster(pic)
     
   })
   
   output$homepage <- renderPlot({
-    pic = readPNG('homepage.png')
+    pic = readPNG('./images/homepage.png')
     plot.new()
     grid::grid.raster(pic)
     
