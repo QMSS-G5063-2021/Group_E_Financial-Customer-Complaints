@@ -1,4 +1,4 @@
-# WhichCollegeToGo  
+# Financial-Customer-Complaints  
 G5063 2021 Spring Data Visualization Group Project    
 Team Members:   
 Cunhonghu Ding, cd3197@columbia.edu;  
@@ -7,23 +7,19 @@ Qianyun Wang, qw2325@columbia.edu;
 Hongcen Tu,ht2547@columbia.edu.
 
 ### Topic
-Which college in the United States offers you the best chance to climb up the ladder?
+Visualizing the consumer complaints from the Bureau of Consumer Financial Protection (CFPB)    
 
 ### Motivation
-This map is a map of opportunity. 
-It answers the question using data for over 30 million college students from 1999-2013.
-The map offers you the insight of the median income and intergenerational mobility at each college in the United States [(Raj Chetty et al. 2017)](http://www.equality-of-opportunity.org/papers/coll_mrc_paper.pdf).
+The purpose of this project is to develop a web application that allows users to quickly explore the Consumer Complaint Database through visualizations. The tool would serve as a starting point for exploratory analysis into this dataset. We have made the raw data available to download for everyone who comes across this tool. Some of the questions that can be answered using this web application include:
+Which states receive the highest number of consumer complaints?
+What are the most frequent terms associated with complaints?
+Do the sentiments expressed differ by financial product?
+Have the trends in consumer complaints changed following COVID?
+Which companies receive the most amount of complaints?
 
 ### Data Descriptions
 
-#### 1. Parental income
-We measure parental income as the average annual household total income before taxes and transfers (defined as Adjusted Gross Income) and adjusted for inflation to 2015 dollars over the five years when the child turned 15-19. 
+Description: 
+The Consumer Complaint Database is a collection of complaints about consumer financial products and services that we sent to companies for response. Complaints are published after the company responds, confirming a commercial relationship with the consumer, or after 15 days, whichever comes first. Complaints referred to other regulators, such as complaints about depository institutions with less than $10 billion in assets, are not published in the Consumer Complaint Database. The database generally updates daily. Each row in this data set corresponds to a complaint that was given by a customer and the related attributes such as a narrative, issue and sub-issue type, related financial product, etc.
+Source: https://www.consumerfinance.gov/data-research/consumer-complaints/ 
 
-#### 2. Child income
-We define child income as individual labor earnings (sum of wage and self- employment earnings) in 2014. 
-
-#### 3. Percentile ranks
-We define percentile ranks by ranking them based on their earnings relative to others in their birth cohort. 
-
-#### 4. Estimated income median and mobility rate
-Following established disclosure standards, we report estimates rather than exact values of the statistics for each college in this interactive map. The estimates are quite accurate: the estimation error is comparable to the fluctuation in the true statistics across years for a typical college that arises due to sampling error. 
