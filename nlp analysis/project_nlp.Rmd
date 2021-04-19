@@ -1,0 +1,189 @@
+---
+title: "NLP Portion for GR5063 Final Project"
+output:
+  html_document:
+    df_print: paged
+---
+
+## Packages
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytext)
+library(tm)
+library(wordcloud)
+library(quanteda)
+library(zoo)
+```
+
+## Read in Data
+```{r message=FALSE, warning=FALSE}
+dfComplaints = readRDS('cfpb_1y.rds')
+```
+
+## Word Cloud
+```{r}
+# Put the words back in a string
+dfComplaints$body = as.character(dfComplaints$Consumer.complaint.narrative)
+dfComplaints$body = removePunctuation(dfComplaints$body)
+```
+
+```{r}
+# Create a corpus
+df_Source = data.frame(doc_id=dfComplaints$Complaint.ID, 
+                       text = dfComplaints$body, stringsAsFactors = FALSE)
+df_Corpus = VCorpus(DataframeSource(df_Source))
+
+# Create DTM
+complaints_dtm = DocumentTermMatrix(df_Corpus)
+
+# Convert back to df
+dfComplaints_dtm = tidy(complaints_dtm)
+dfComplaints_dtm$document = as.numeric(dfComplaints_dtm$document)
+
+# Bind tf, id, idf frequencies
+dfComplaints_dtm = dfComplaints_dtm %>%
+  bind_tf_idf(term, document, count)
+```
+
+```{r message=FALSE, warning=FALSE}
+# Find Count
+dfComplaints_count = dfComplaints_dtm %>% group_by(term) %>% summarise(n = sum(count))
+
+# Set seed
+set.seed(2103)
+
+# Word Cloud
+wordcloud(dfComplaints_count$term, dfComplaints_count$n, 
+          max.words = 100, colors = brewer.pal(8, "BrBG"),
+          scale = c(4, 0.4))
+```
+
+## Comparison Cloud - Based on Product
+```{r message=FALSE, warning=FALSE, dpi=400}
+# Group text by product
+dfComplaints_product = dfComplaints %>%
+  group_by(doc_id = Product) %>%
+  summarise(text=paste(body, collapse=' '))
+
+# Turn into corpus
+dfComplaints_product = VCorpus(DataframeSource(dfComplaints_product))
+
+# Create TDM
+dfComplaints_tdm = as.matrix(TermDocumentMatrix(dfComplaints_product))
+
+# Write to csv
+
+# Get some random colours
+set.seed(2301)
+library(randomcoloR)
+mypal = distinctColorPalette(9)
+
+# Comparison cloud
+comparison.cloud(dfComplaints_tdm, colors=mypal,
+                 random.order=FALSE, scale=c(3, 0.2), 
+                 max.words=500, title.size=1,
+                 title.colors=mypal)
+```
+
+## Sentiment Scores
+```{r}
+# Reading in Hu-Liu dictionary
+pos = read.table('positive-words.txt', as.is=T)
+neg = read.table('negative-words.txt', as.is=T)
+
+# Stemming the dictionaries
+pos = stemDocument(pos$V1)
+neg = stemDocument(neg$V1)
+
+# Build dictionary
+my_dict = dictionary(list(
+  positive = pos,
+  negative = neg
+))
+```
+
+```{r}
+# Remove stopwords
+dfComplaints$body_stem = str_trim(removeWords(dfComplaints$body, stopwords('en')))
+
+# Stem body
+dfComplaints$body_stem = stemDocument(dfComplaints$body_stem)
+
+# New Source
+df_Stem_Source = data.frame(doc_id=dfComplaints$Complaint.ID, 
+                            text = dfComplaints$body_stem, stringsAsFactors = FALSE)
+
+# Apply dictionary to stemmed text
+dfStem_Source_dfm = as.data.frame(dfm(corpus(df_Stem_Source), dictionary = my_dict))
+
+# Obtain Sentiment
+dfStem_Source_dfm$sentiment = ifelse(dfStem_Source_dfm$positive + dfStem_Source_dfm$negative == 0,
+                                     0, (dfStem_Source_dfm$positive - dfStem_Source_dfm$negative) /
+                                       (dfStem_Source_dfm$positive + dfStem_Source_dfm$negative))
+
+# Join sentiment to dfSample
+dfStem_Source_dfm$doc_id = as.numeric(dfStem_Source_dfm$doc_id)
+dfComplaints = left_join(dfComplaints, dfStem_Source_dfm %>% select(doc_id, sentiment), 
+                     by=c('Complaint.ID' = 'doc_id'))
+```
+
+```{r}
+# Month-Year
+dfComplaints$my = format(as.Date(dfComplaints$date), "%Y-%m")
+
+# Mean Sentiment
+dfComplaints %>% group_by(my, Product) %>%
+  summarise(mean_sentiment = mean(sentiment)) %>%
+  ggplot(data=.)+
+  geom_line(aes(x=as.Date(as.yearmon(my)), y=mean_sentiment, color=Product), show.legend=F)+
+  labs(x='Time', y='Mean Sentiment')
+```
+
+```{r}
+dfComplaints %>% group_by(Product) %>%
+  summarise(mean_sentiment = mean(sentiment))
+```
+
+## Differences between credit reporting, debt collection and the others
+```{r}
+# Low cats
+low_cats = c('Credit reporting, credit repair services, or other personal consumer reports',
+             'Debt collection')
+
+dfComplaints$category = ifelse(
+  dfComplaints$Product %in% low_cats, 'low', 'high')
+
+# Join category to dfComplaints_dtm
+dfComplaints_dtm = left_join(dfComplaints_dtm, 
+                             dfComplaints %>% select(Complaint.ID, category),
+                             by=c('document' = 'Complaint.ID'))
+
+# Select top 20 terms overall
+top_20_words = dfComplaints_dtm %>% group_by(term) %>%
+  summarise(n = sum(count)) %>%
+  arrange(desc(n)) %>%
+  head(20)
+
+# Sub-sample
+dfSampleTop20 = dfComplaints_dtm %>% 
+  filter(term %in% top_20_words$term) %>%
+  group_by(term, category) %>%
+  summarise(frequency = sum(count))
+```
+
+```{r}
+ggplot(dfSampleTop20, aes(x = reorder(term, frequency), fill = category))+
+  geom_bar(data=dfSampleTop20 %>% filter(category=='low'), 
+           aes(y=frequency), stat='identity')+
+  geom_bar(data=dfSampleTop20 %>% filter(category=='high'), 
+           aes(y=-frequency), stat='identity')+
+  scale_fill_brewer(palette = "Set1")+
+  labs(x='Term', y='Frequency',
+       title="Top 20 Most Frequent Words in Complaints",
+       subtitle= 'by Sentiment Category')+
+  scale_y_continuous(labels=abs)+
+  coord_flip()
+```
+
+
+
