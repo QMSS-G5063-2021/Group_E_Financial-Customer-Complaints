@@ -4,7 +4,7 @@ Team Members:
 Cunhonghu Ding, cd3197@columbia.edu;  
 Weiran Yu, wy2365@columbia.edu;  
 Qianyun Wang, qw2325@columbia.edu;  
-Hongcen Tu,ht2547@columbia.edu.
+Hongcen Tu, ht2547@columbia.edu.
 
 ### Topic
 Visualizing the consumer complaints from the Bureau of Consumer Financial Protection (CFPB)    
@@ -25,4 +25,4 @@ The Consumer Complaint Database is a collection of complaints about consumer fin
 Source: https://www.consumerfinance.gov/data-research/consumer-complaints/ 
 
 ### Shiny App Link: 
-https://cunhonghuding.shinyapps.io/Financial-Customer-Complaints/ 
+https://weiranyu.shinyapps.io/5063/
