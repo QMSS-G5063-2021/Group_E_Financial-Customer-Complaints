@@ -26,3 +26,8 @@ Source: https://www.consumerfinance.gov/data-research/consumer-complaints/
 
 ### Shiny App Link: 
 https://weiranyu.shinyapps.io/5063/
+
+### Video Presentation
+[![IMAGE ALT TEXT](/images/homepage.png)](https://www.youtube.com/watch?v=zbSfBbhxEZU "[GR5063 Data Visualization - Spring 2021] Group E Financial Consumer Complaints
+")
+Backup link: https://www.youtube.com/watch?v=zbSfBbhxEZU
