@@ -90,9 +90,19 @@ ui <- navbarPage("Financial Consumer Complaints",
                           
                           plotOutput(outputId = "homepage", width = "100%" , height = "300px"),
                           
-                          shiny::HTML("<h5>This is an interactive tool to help you explore the financial
-                            customer complaints data from 2019 to 2020. Please feel free to navigate to any of the tabs above to explore visualizations broken down by geographical location, text content, and complaint type.</h5>"),
+                          shiny::HTML("<h5>The purpose of this project is to develop a web application that allows users to quickly
+                            explore the Consumer Complaint Database through visualizations. The tool would serve
+                            as a starting point for exploratory analysis into this dataset. We have made the raw data
+                            available to download for everyone who comes across this tool. Some of the questions
+                            that can be answered using this web application include:</h5>"),
                           
+                          shiny::HTML("<h5> 1. Which states receive the highest number of consumer complaints?</h5>"),
+                          shiny::HTML("<h5> 2. What are the most frequent terms associated with complaints?</h5>"),
+                          shiny::HTML("<h5> 3. Do the sentiments expressed differ by financial product?</h5>"),
+                          shiny::HTML("<h5> 4. Have the trends in consumer complaints changed following COVID?</h5>"),
+                          shiny::HTML("<h5> 5. Which companies receive the most amount of complaints?</h5>"),
+                          
+                          shiny::HTML("<br>"),
                           shiny::HTML("<h5>The Consumer Financial Protection Bureau is a U.S. government
                             agency that makes sure banks, lenders, and other financial companies
                             treat you fairly. Consumer Complaint Database is a collection of
@@ -124,12 +134,12 @@ ui <- navbarPage("Financial Consumer Complaints",
                           h4("Comparison of different words across products"),
                           plotOutput('comparisoncloud'),
                           tags$hr(),
-                          h4("Difference in sentiment scores across products"),
-                          HTML('<h5>There are clearly two categories of sentiment. The descriptions for credit reporting services and debt collection have visibly lower sentiment scores than the other categories.</h5>'),
+                          h4("Difference in sentiment scores across products over time"),
+                          HTML('<h5>There are clearly two categories of sentiment. The descriptions for credit reporting services and debt collection have visibly lower sentiment scores than the other categories. There is no evident time trend for sentiment.</h5>'),
                           plotlyOutput('sentiment'),
                           tags$hr(),
                           h4('Pyramid Plot of most common words'),
-                          HTML('<h5>The pyramid plot below shows the differences in word frequency in the complaints among the two groups, determined by their sentiment scores.</h5>'),
+                          HTML('<h5>The pyramid plot below shows the differences in word frequency in the complaints among the two groups, determined by their sentiment scores. The "low" sentiment category contains credit reporting services and debt collection, identified in the chart above. All other product types belong in the "high" category.</h5>'),
                           plotlyOutput('top20')
                  ),
                  
@@ -144,8 +154,9 @@ ui <- navbarPage("Financial Consumer Complaints",
                                              label = "Download data")
                             ),
                             mainPanel(
+                              HTML('<h5>Toggle the product filter and tabs to explore complaints related to each product type using different aggregation standards.</h5>'),
                               tabsetPanel(
-                                tabPanel("Complaint by date",  plotOutput("distPlot")),
+                                tabPanel("Complaint by date",  plotlyOutput("distPlot")),
                                 tabPanel("Complaint by states", plotlyOutput("barPlot")),
                                 tabPanel("Complaint by types", plotlyOutput("barPlot2")),
                                 tabPanel("Complaint by company", plotlyOutput("goemPlot"))
@@ -173,22 +184,28 @@ server <- function(input, output) {
     
   })
   
-  output$distPlot <- renderPlot({
+  output$distPlot <- renderPlotly({
     df <- dat %>% filter(Product==input$product)
     df <- df[df$Timely.response.==input$response,]
-    df %>% group_by(yearmon) %>% summarise(count=n()) %>%
+    dist = df %>% group_by(yearmon) %>% summarise(count=n()) %>%
       ggplot(aes(x=yearmon, y=count)) + geom_line(color="blue") +
       labs(x="Month Received", y="The number of complaints") +
-      geom_point() + geom_vline(xintercept = as.yearmon("2020-3-21"), col="red")
+      geom_point() + geom_vline(xintercept = as.yearmon("2020-3-21"), col="red")+
+      geom_text(aes(x=as.yearmon("2020-3-1"), y=2200, label='Start of COVID-19 lockdowns'), color='red')+
+      theme_ipsum()
+    ggplotly(dist, height=500)
   })
   
   output$barPlot <- renderPlotly({
     df <- dat %>% filter(Product==input$product)
     df <- df[df$`Timely.response.`==input$response,]
     p <- df %>% filter(nchar(State)==2) %>% group_by(State) %>% summarise(count=n()) %>%
-      ggplot(aes(x=reorder(State, count), y=count, fill=State)) + geom_bar(stat="identity") + coord_flip()+
-      labs(x="States", y="The number of complaints") 
-    ggplotly(p, height=800)
+      ggplot(aes(x=reorder(State, count), y=count, fill=State))+ 
+      geom_bar(stat="identity") + 
+      coord_flip()+
+      labs(x="States", y="The number of complaints")+
+      theme_ipsum()
+    ggplotly(p, tooltip = c("y", "fill"), height=800)
     
   })
   
@@ -197,8 +214,9 @@ server <- function(input, output) {
     df <- df[df$`Timely.response.`==input$response,]
     c <- df  %>% group_by(Sub.product) %>% summarise(count=n()) %>%
       ggplot(aes(x=reorder(Sub.product,count), y=count, fill=count)) + geom_bar(stat="identity")+
-      labs(x="Sub product", y="The number of complaints") + coord_flip()
-    ggplotly(c, height=800) 
+      labs(x="Sub product", y="The number of complaints") + coord_flip()+
+      theme_ipsum()
+    ggplotly(c, tooltip = c("y"), height=500) 
   })
   
   output$goemPlot <- renderPlotly({
@@ -206,43 +224,45 @@ server <- function(input, output) {
     df <- df[df$`Timely.response.`==input$response,]
     d <- df  %>% group_by(Company) %>% summarise(count=n()) %>%head(5)%>%
       ggplot(aes(x=reorder(Company,count), y=count, fill=count)) + geom_bar(stat="identity")+
-      labs(x="Company", y="The number of complaints") + coord_flip()
-    ggplotly(d, height=800) 
+      labs(x="Company", y="The number of complaints") + coord_flip()+
+      theme_ipsum()
+    ggplotly(d, tooltip = c("y"), height=500) 
   })
   
   output$comparisoncloud <- renderPlot({
     dfComplaints_tdm = dfComplaints_tdm %>% column_to_rownames(., var = "X")
-    mypal = distinctColorPalette(9)
+    mypal = brewer.pal(n = 9, name = "Paired")
     comparison.cloud(dfComplaints_tdm, colors=mypal,
-                     random.order=FALSE, scale=c(3, 0.2), 
-                     max.words=500, title.size=1,
+                     random.order=FALSE, scale=c(5, 0.2), 
+                     max.words=200, title.size=0.5,
                      title.colors=mypal)
   })
   
   output$sentiment <- renderPlotly({
     sent.plot = dfComplaints %>% group_by(my, Product) %>%
       summarise(mean_sentiment = mean(sentiment)) %>%
+      mutate(Date=as.Date(as.yearmon(my))) %>%
       ggplot(data=.)+
-      geom_line(aes(x=as.Date(as.yearmon(my)), y=mean_sentiment, color=Product))+
+      geom_line(aes(x=Date, y=mean_sentiment, color=Product))+
       labs(x='Time', y='Mean Sentiment')+
       theme_ipsum()
     ggplotly(sent.plot, height=450)
   })
   
   output$top20 <- renderPlotly({
-    py = ggplot(dfSampleTop20, aes(x = reorder(term, frequency), fill = category))+
+    abs_commma <- function(x) {comma(abs(x))}
+    py = ggplot(dfSampleTop20, aes(x = reorder(term, frequency), fill = category, label=term))+
       geom_bar(data=dfSampleTop20 %>% filter(category=='low'), 
                aes(y=frequency), stat='identity')+
       geom_bar(data=dfSampleTop20 %>% filter(category=='high'), 
                aes(y=-frequency), stat='identity')+
       scale_fill_brewer(palette = "Set1")+
       labs(x='Term', y='Frequency',
-           title="Top 20 Most Frequent Words in Complaints",
-           subtitle= 'by Sentiment Category')+
-      scale_y_continuous(labels=abs)+
+           title="Top 20 Most Frequent Words in Complaints, by Sentiment Category")+
+      scale_y_continuous(labels=abs_commma)+
       coord_flip()+
       theme_ipsum()
-    ggplotly(py, height=450)
+    ggplotly(py, tooltip = c("y", "label"), height=450)
   })
 
   output$map <- renderPlot({
