@@ -5,9 +5,9 @@ account: weiranyu
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3987774
-bundleId: 4488391
+bundleId: 4511587
 url: https://weiranyu.shinyapps.io/5063/
-when: 1618794917.80266
-lastSyncTime: 1618794917.80316
+when: 1619213629.89893
+lastSyncTime: 1619213629.89893
 asMultiple: FALSE
 asStatic: FALSE
